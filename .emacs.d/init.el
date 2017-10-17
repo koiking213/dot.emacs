@@ -1,3 +1,9 @@
+;; proxy
+(setq load-path (append
+                 '("~/.emacs.d/private-conf")
+                 load-path))
+(load "myproxy" t)
+
 ;; C-hをバックスペースに
 (keyboard-translate ?\C-h ?\C-?)
 
@@ -16,6 +22,30 @@
 (global-set-key "\M-p" 'scroll-up-in-place)
 (global-set-key "\M-n" 'scroll-down-in-place)
 
+;; 行頭でC-kすると改行ごとキルする
+(defun kill-line-twice (&optional numlines)
+  "Acts like normal kill except kills entire line if at beginning"
+  (interactive "p")
+  (cond ((or (= (current-column) 0)
+                  (> numlines 1))
+          (kill-line numlines))
+        (t (kill-line))))
+(global-set-key "\C-k" 'kill-line-twice)
+
+;; 現在の関数名を表示
+(which-function-mode 1)
+
+;; org mode
+(setq org-use-speed-commands t)
+
+;; cua mode
+(cua-mode t)
+(setq cua-enable-cua-keys nil) ; デフォルトキーバインドを無効化
+(define-key global-map (kbd "C-x SPC") 'cua-set-rectangle-mark)
+
+;; タイトルバー
+(setq frame-title-format (format "%%b" invocation-name))
+
 ;; showing and hiding blocks of code
 (add-hook 'c-mode-common-hook
   (lambda()
@@ -30,7 +60,9 @@
 (setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
         ("melpa" . "http://melpa.org/packages/")
-        ("org" . "http://orgmode.org/elpa/")))
+        ("org" . "http://orgmode.org/elpa/")
+	("marmalade" . "http://marmalade-repo.org/packages/")))
+
 
 ;; use package
 (require 'use-package)
@@ -58,16 +90,27 @@
 (bind-keys*
  ("C-;" . helm-for-files))
 
+;; package-installのために必要
+(require 'epg)
+
+;; magit
+(require 'magit)
+(global-set-key (kbd "C-x g") 'magit-status)
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (magit helm use-package migemo))))
+ '(package-selected-packages (quote (## magit helm use-package migemo))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(font-lock-string-face ((t (:foreground "color-135"))))
+ '(magit-section-highlight ((t (:background "color-17"))))
+ '(minibuffer-prompt ((t (:foreground "brightcyan")))))
+
 
