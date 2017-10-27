@@ -7,8 +7,14 @@
 ;; C-hをバックスペースに
 (keyboard-translate ?\C-h ?\C-?)
 
-;; C-o to switch windows in order
+;;; (yes/no) を (y/n)に
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; C-o で順番にウィンドウを切り替える
 (global-set-key  "\C-o" 'other-window)
+
+;; カーソル位置のファイル名を開く
+(ffap-bindings)
 
 ;; M-p to scroll up, M-n to scroll down
 (defun scroll-up-in-place (n)
@@ -61,7 +67,7 @@
       '(("gnu" . "http://elpa.gnu.org/packages/")
         ("melpa" . "http://melpa.org/packages/")
         ("org" . "http://orgmode.org/elpa/")
-	("marmalade" . "http://marmalade-repo.org/packages/")))
+	))
 
 
 ;; use package
@@ -95,13 +101,61 @@
 (require 'magit)
 (global-set-key (kbd "C-x g") 'magit-status)
 
+;; ediffでコンフリクト解消する際に両方採用する
+(defun ediff-copy-both-to-C ()
+  (interactive)
+  (ediff-copy-diff ediff-current-difference nil 'C nil
+                   (concat
+                    (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
+                    (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
+(defun add-d-to-ediff-mode-map () (define-key ediff-mode-map "d" 'ediff-copy-both-to-C))
+(add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
+
+;; C-s C-wでカーソル下の単語検索(デフォルトだとカーソルから単語末まで)
+(defun isearch-forward-with-heading ()
+  "Search the word your cursor looking at."
+  (interactive)
+  (command-execute 'backward-word)
+  (command-execute 'isearch-forward))
+(global-set-key "\C-s" 'isearch-forward-with-heading)
+
+;; ;; C/C++文法チェック
+;; (require 'flycheck)
+;; (flycheck-define-checker c/c++
+;;   "A C/C++ checker using g++."
+;;   :command ("g++" "-Wall" "-Wextra" source)
+;;   :error-patterns  ((error line-start
+;;                            (file-name) ":" line ":" column ":" " エラー: " (message)
+;;                            line-end)
+;;                     (warning line-start
+;;                            (file-name) ":" line ":" column ":" " 警告: " (message)
+;;                            line-end))
+;;   :modes (c-mode c++-mode))
+;;(add-hook 'cc-mode 'flycheck-mode)
+;;(add-hook 'after-init-hook #'global-flycheck-mode)
+
+;;; GNU global
+(require 'ggtags)
+(bind-keys*
+ ("M-r" . ggtags-find-reference))
+
+(add-hook 'c-mode-common-hook
+	  '(lambda()
+	     (gtags-mode 1)
+	     ))
+
+;; projectile
+(use-package projectile)
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (tramp-theme ## magit helm use-package migemo))))
+ '(package-selected-packages
+   (quote
+    (projectile flycheck ggtags tramp-theme ## magit helm use-package migemo))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
