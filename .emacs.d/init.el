@@ -19,6 +19,14 @@
 ;; カーソル位置のファイル名を開く
 (ffap-bindings)
 
+;; リージョン非選択時にC-wで前の単語削除
+(defun kill-dwim (&optional arg)
+  (interactive)
+  (if (region-active-p)
+      (kill-region (mark) (point))
+    (backward-kill-word (or arg 1))))
+(global-set-key "\C-w" 'kill-dwim)
+
 ;; M-p to scroll up, M-n to scroll down
 (defun scroll-up-in-place (n)
   (interactive "p")
@@ -163,7 +171,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (yaml-mode projectile flycheck ggtags tramp-theme ## magit helm use-package migemo))))
+    (w3m markdown-mode gh-md yaml-mode projectile flycheck ggtags tramp-theme ## magit helm use-package migemo))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
