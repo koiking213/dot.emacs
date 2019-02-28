@@ -1,8 +1,6 @@
-;; proxy
 (setq load-path (append
-                 '("~/.emacs.d/private-conf")
+                 '("~/.emacs.d/elisp")
                  load-path))
-(load "myproxy" t)
 
 ;; C-hをバックスペースに
 (keyboard-translate ?\C-h ?\C-?)
@@ -89,22 +87,23 @@
 ;; use package
 (require 'use-package)
 
+
 ;;;===============================================
 ;;; cmigemo設定
 ;;;===============================================
-(use-package migemo)
-(when (eq system-type 'windows-nt)
-  (setq migemo-dictionary "C:/Users/koiki/AppData/Roaming/.emacs.d/conf/migemo/dict/cp932/migemo-dict")
-  (setq migemo-coding-system 'cp932-unix))
-(when (eq system-type 'gnu/linux)
-  (setq migemo-dictionary "/usr/local/share/migemo/utf-8/migemo-dict")
-  (setq migemo-coding-system 'utf-8-unix))
-(setq migemo-command "cmigemo")
-(setq migemo-options '("-q" "--emacs" "-i" "\a"))
-(setq migemo-user-dictionary nil)
-(setq migemo-regex-dictionary nil)
-(load-library "migemo") ; ロードパス指定.
-(migemo-init)
+;;(use-package migemo)
+;;(when (eq system-type 'windows-nt)
+;;  (setq migemo-dictionary "C:/Users/koiki/AppData/Roaming/.emacs.d/conf/migemo/dict/cp932/migemo-dict")
+;;  (setq migemo-coding-system 'cp932-unix))
+;;(when (eq system-type 'gnu/linux)
+;;  (setq migemo-dictionary "/usr/local/share/migemo/utf-8/migemo-dict")
+;;  (setq migemo-coding-system 'utf-8-unix))
+;;(setq migemo-command "cmigemo")
+;;(setq migemo-options '("-q" "--emacs" "-i" "\a"))
+;;(setq migemo-user-dictionary nil)
+;;(setq migemo-regex-dictionary nil)
+;;(load-library "migemo") ; ロードパス指定.
+;;(migemo-init)
 
 ;; helm
 (bind-keys*
@@ -150,18 +149,45 @@
 ;;(add-hook 'cc-mode 'flycheck-mode)
 ;;(add-hook 'after-init-hook #'global-flycheck-mode)
 
-;;; GNU global
-(require 'ggtags)
-(bind-keys*
- ("M-r" . ggtags-find-reference))
 
-(add-hook 'c-mode-common-hook
-	  '(lambda()
-	     (gtags-mode 1)
-	     ))
+;; rtags
+(require 'rtags)
+;(load-file "~/.emacs.d/elisp/rtags.el")
+(add-hook 'c-mode-hook 'rtags-start-process-unless-running)
+(add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+;; ;; rtags
+;; (when (require 'rtags nil 'noerror)
+;;   (add-hook 'c++-mode-hook
+;;             (lambda ()
+;;               (when (rtags-is-indexed)
+;;                 (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
+;;                 (local-set-key (kbd "M-;") 'rtags-find-symbol)
+;;                 (local-set-key (kbd "M-@") 'rtags-find-references)
+;;                                 (local-set-key (kbd "M-,") 'rtags-location-stack-back)))))
 
 ;; projectile
 (use-package projectile)
+
+;; shell-mode
+(define-key shell-mode-map (kbd "M-p") 'comint-previous-matching-input-from-input)
+(define-key shell-mode-map (kbd "M-n") 'comint-next-matching-input-from-input)
+
+;; autopep
+(use-package py-autopep8)
+(add-hook 'before-save-hook 'py-autopep8-before-save)
+
+;;; elpy-mode
+(defun fix-before-save()
+  (if (eq major-mode `python-mode)
+      (elpy-autopep8-fix-code)))
+(defun elpy-auto-fix-before-save ()
+  (add-hook 'before-save-hook 'fix-before-save))
+(when (and (require 'python nil t) (require 'elpy nil t))
+  (elpy-enable)
+  (define-key python-mode-map (kbd "C-c C-f") 'elpy-goto-definition)
+  (define-key elpy-mode-map (kbd "C-c C-f") 'elpy-goto-definition)
+  (elpy-auto-fix-before-save)
+  )
 
 
 (custom-set-variables
@@ -171,7 +197,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (w3m markdown-mode gh-md yaml-mode projectile flycheck ggtags tramp-theme ## magit helm use-package migemo))))
+    (elpy py-autopep8 nhexl-mode rtags yasnippet w3m markdown-mode gh-md yaml-mode projectile flycheck ggtags tramp-theme ## magit helm use-package migemo))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -185,6 +211,7 @@
  '(font-lock-keyword-face ((t (:foreground "brightmagenta"))))
  '(font-lock-string-face ((t (:foreground "color-135"))))
  '(font-lock-type-face ((t (:foreground "green"))))
+ '(highlight-indentation-face ((t (:inherit black))))
  '(magit-section-highlight ((t (:background "color-17"))))
  '(minibuffer-prompt ((t (:foreground "brightcyan")))))
 
