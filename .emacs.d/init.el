@@ -8,6 +8,18 @@
 ;; デフォルトのインデントはスペース4つ
 (setq-default tab-width 4 indent-tabs-mode nil)
 
+;; Cのインデント設定
+(add-hook 'c-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode nil)
+            (setq c-basic-offset 4)))
+
+;; C++のインデント設定
+(add-hook 'c++-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode nil)
+            (setq c-basic-offset 4)))
+
 ;;; (yes/no) を (y/n)に
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -150,11 +162,11 @@
 ;;(add-hook 'after-init-hook #'global-flycheck-mode)
 
 
-;; rtags
-(require 'rtags)
-;(load-file "~/.emacs.d/elisp/rtags.el")
-(add-hook 'c-mode-hook 'rtags-start-process-unless-running)
-(add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+;; ;; rtags
+;; (require 'rtags)
+;; ;(load-file "~/.emacs.d/elisp/rtags.el")
+;; (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
+;; (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
 ;; ;; rtags
 ;; (when (require 'rtags nil 'noerror)
 ;;   (add-hook 'c++-mode-hook
@@ -197,7 +209,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (elpy py-autopep8 nhexl-mode rtags yasnippet w3m markdown-mode gh-md yaml-mode projectile flycheck ggtags tramp-theme ## magit helm use-package migemo))))
+    (haskell-mode elpy py-autopep8 nhexl-mode rtags yasnippet w3m markdown-mode gh-md yaml-mode projectile flycheck ggtags tramp-theme ## magit helm use-package migemo))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
